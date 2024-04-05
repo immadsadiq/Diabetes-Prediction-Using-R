@@ -1,0 +1,83 @@
+---
+title: "Diabetes Prediction"
+author: "Immad Sadiq"
+date: "2024-03-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+data<-read.csv('D:\\datasets\\diabetes.csv')
+head(data)
+```
+
+```{r}
+library(caTools)
+split <- sample.split(data,SplitRatio = 0.8)
+split
+```
+
+```{r}
+training <- subset(data,split =='TRUE')
+testing <- subset(data,split == 'FALSE')
+
+```
+
+```{r}
+model<-glm(Outcome ~.,training,family = 'binomial')
+
+```
+
+```{r}
+model<-glm(Outcome ~.,training,family = 'binomial')
+summary(model)
+```
+
+```{r}
+res <- predict(model,testing,type = 'response')
+res
+testing
+```
+
+```{r}
+table(ActualValue = testing$Outcome , PredictedValue=res>0.5)
+```
+
+```{r}
+(100+27)/(100+16+28+27)
+
+```
+```{r}
+res <- predict(model,training,type = 'response')
+res
+
+```
+
+```{r}
+library(ROCR)
+ROCRPred = prediction(res,training$Outcome)
+ROCRPref <- performance(ROCRPred,"tpr","fpr")
+plot(ROCRPref,color=TRUE,print.cutoffs.at = seq(0.1,by=0.1))
+```
+```{r}
+# Assuming 'res' contains predicted probabilities or class predictions
+# and 'testing$Outcome' contains true outcomes
+
+# Apply threshold for binary classification
+predicted_values <- ifelse(res > 0.3, TRUE, FALSE)
+
+# Check the lengths of vectors
+if (length(testing$Outcome) == length(predicted_values)) {
+  # Create contingency table
+  result_table <- table(ActualValue = testing$Outcome, PredictedValue = predicted_values)
+  print(result_table)
+} else {
+  print("Error: Lengths of vectors do not match.")
+}
+
+```
